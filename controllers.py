@@ -7,15 +7,15 @@ import time
 
 class LoginUserControllers(MethodView):
     """
-        Example Login
+        registro
     """
     def post(self):
         #simulacion de espera en el back con 1.5 segundos
         time.sleep(1)
         content = request.get_json()
+        name = content.get("name")
         email = content.get("email")
         password = content.get("password")
-        token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
-        if (email == "test@gmail.com" and password == "12345"):
-            return jsonify({"auth": True, "name": "Pepe Perez", "token": token}), 200
-        return jsonify({"auth": False}), 401
+
+        return jsonify({"registro ok": True, "name": name, "email": email, "password": password}), 200
+        
