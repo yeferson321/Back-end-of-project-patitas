@@ -1,9 +1,11 @@
 from flask.views import MethodView
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL, MySQLdb
-from flaskext.mysql import MySQL
+from config import KEY_TOKEN_AUTH
+import datetime
 import time
 import bcrypt
+import jwt
 import os
 
 app = Flask(__name__)
@@ -88,7 +90,7 @@ class LoginUserControllers(MethodView):
         content = request.get_json()
         email = content.get("email")
         password = content.get("password")
-        token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+
         # creamos comandos sql para verificar que la informacion que ingresamos sea correcta
         cur = mysql.connection.cursor()
         cur.execute("SELECT nombre, ultinombre, celular, email, password FROM users WHERE email=%s", ([email]))
@@ -105,8 +107,10 @@ class LoginUserControllers(MethodView):
             passwordUser = usuario[correo]["contraseña"]
 
             if bcrypt.checkpw(bytes(str(password), encoding= 'utf-8'), passwordUser.encode('utf-8')):
+                
+                encoded_jwt = jwt.encode({'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=15), 'correo': correo}, KEY_TOKEN_AUTH , algorithm='HS256')
 
-                return jsonify({"auth": True, "nombre": user[0], "ultinombre": user[1], "celular": user[2], "email": user[3], "token": token}), 200  
+                return jsonify({"auth": True, "nombre": user[0], "ultinombre": user[1], "celular": user[2], "email": user[3], "token": encoded_jwt}), 200  
 
             else:  
             
